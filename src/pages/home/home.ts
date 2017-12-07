@@ -65,9 +65,10 @@ export class HomePage implements OnInit, OnDestroy {
 
   getSQLData() {
 
-    this.sqlConn.executeSql('select * from randomData limit 1', {})
+    this.sqlConn.executeSql('SELECT * FROM randomData LIMIT 1', {})
       .then((data) => {
         console.log('Executed SQL', data)
+        this.data = data;
         alert(data);
       })
       .catch(e => console.log(e));
@@ -79,13 +80,13 @@ export class HomePage implements OnInit, OnDestroy {
 
   createDB() {
 
-    this.sqlConn.executeSql('create table randomData(email VARCHAR(32))', {})
+    this.sqlConn.executeSql('CREATE TABLE randomData(email VARCHAR(32))', {})
         .then(() => console.log('Executed SQL'))
         .catch(e => console.log('gui', e));
   }
 
   insertValues(email: string) {
-    this.sqlConn.executeSql('insert into randomData VALUES (?)',[email])
+    this.sqlConn.executeSql('INSERT INTO randomData VALUES (?)',[email])
         .then(() => console.log('Executed SQL'))
         .catch(e => console.log(e));
   }
