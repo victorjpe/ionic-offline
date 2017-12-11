@@ -79,7 +79,6 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   createDB() {
-    debugger;
     this.sqlite.create({
       name: 'offline',
       location: 'default'
@@ -96,7 +95,6 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   insertValues(email: string) {
-    debugger;
     this.sqlite.create({
       name: 'offline',
       location: 'default'
