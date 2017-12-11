@@ -31,7 +31,7 @@ export class HomePage implements OnInit, OnDestroy {
       this.sqlConn = db;
       this.createDB();
     })
-      .catch(e => console.log(e));;
+      .catch(e => console.log(e));
 
     // watch network for a connection
     this.connectSubscription = this.network.onConnect().subscribe(() => {
@@ -67,9 +67,10 @@ export class HomePage implements OnInit, OnDestroy {
 
     this.sqlConn.executeSql('SELECT * FROM randomData LIMIT 1', {})
       .then((data) => {
-        console.log('Executed SQL', data)
-        this.data = data;
-        alert(data);
+        debugger;
+        let email = data.rows.item(0).email;
+        console.log('Executed SQL', email)
+        this.data = email;
       })
       .catch(e => console.log(e));
   }
@@ -79,14 +80,14 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   createDB() {
-
-    this.sqlConn.executeSql('CREATE TABLE randomData(email VARCHAR(32))', {})
+    this.sqlConn.executeSql('DROP TABLE randomData', {});
+    this.sqlConn.executeSql('CREATE TABLE IF NOT EXISTS randomData(sino INTEGER primary key, email VARCHAR(32))', {})
         .then(() => console.log('Executed SQL'))
         .catch(e => console.log('gui', e));
   }
 
   insertValues(email: string) {
-    this.sqlConn.executeSql('INSERT INTO randomData VALUES (?)',[email])
+    this.sqlConn.executeSql('INSERT OR REPLACE INTO randomData VALUES (?,?)', [1, email])
         .then(() => console.log('Executed SQL'))
         .catch(e => console.log(e));
   }
