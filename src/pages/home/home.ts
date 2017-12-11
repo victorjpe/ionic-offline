@@ -17,21 +17,12 @@ export class HomePage implements OnInit, OnDestroy {
   public data: any = '';
 
   ngOnInit(): void {
+    debugger;
     // watch network for a disconnect
     this.disconnectSubscription = this.network.onDisconnect().subscribe(() => {
       this.connectionExist = false;
       console.log('network was disconnected :-(');
     });
-
-    //DB connection
-    this.sqlite.create({
-      name: 'offline',
-      location: 'default'
-    }).then((db: SQLiteObject) => {
-      this.sqlConn = db;
-      this.createDB();
-    })
-      .catch(e => console.log(e));
 
     // watch network for a connection
     this.connectSubscription = this.network.onConnect().subscribe(() => {
@@ -46,10 +37,12 @@ export class HomePage implements OnInit, OnDestroy {
         }
       }, 3000);
     });
-    this.getOrders();
+    this.createDB();
   }
 
-  constructor(public navCtrl: NavController, private network: Network, private sqlite: SQLite, private http: HttpClient) { }
+  constructor(public navCtrl: NavController, private network: Network, private sqlite: SQLite, private http: HttpClient) {
+
+  }
 
   getOrders() {
     // if(this.connectionExist){
@@ -64,15 +57,21 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   getSQLData() {
-
-    this.sqlConn.executeSql('SELECT * FROM randomData LIMIT 1', {})
-      .then((data) => {
-        debugger;
-        let email = data.rows.item(0).email;
-        console.log('Executed SQL', email)
-        this.data = email;
-      })
+    this.sqlite.create({
+      name: 'offline',
+      location: 'default'
+    }).then((db: SQLiteObject) => {
+      db.executeSql('SELECT * FROM randomData LIMIT 1', {})
+        .then((data) => {
+          debugger;
+          let email = data.rows.item(0).email;
+          console.log('Executed SQL', email)
+          this.data = email;
+        })
+        .catch(e => console.log(e));
+    })
       .catch(e => console.log(e));
+
   }
 
   clearEmail() {
@@ -80,16 +79,34 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   createDB() {
-    this.sqlConn.executeSql('DROP TABLE randomData', {});
-    this.sqlConn.executeSql('CREATE TABLE IF NOT EXISTS randomData(sino INTEGER primary key, email VARCHAR(32))', {})
+    debugger;
+    this.sqlite.create({
+      name: 'offline',
+      location: 'default'
+    }).then((db: SQLiteObject) => {
+
+      db.executeSql('DROP TABLE randomData', {});
+      db.executeSql('CREATE TABLE IF NOT EXISTS randomData(sino INTEGER primary key, email VARCHAR(32))', {})
         .then(() => console.log('Executed SQL'))
         .catch(e => console.log('gui', e));
+      this.getOrders();
+    })
+      .catch(e => console.log(e));
+
   }
 
   insertValues(email: string) {
-    this.sqlConn.executeSql('INSERT OR REPLACE INTO randomData VALUES (?,?)', [1, email])
+    debugger;
+    this.sqlite.create({
+      name: 'offline',
+      location: 'default'
+    }).then((db: SQLiteObject) => {
+      db.executeSql('INSERT OR REPLACE INTO randomData VALUES (?,?)', [1, email])
         .then(() => console.log('Executed SQL'))
         .catch(e => console.log(e));
+    })
+      .catch(e => console.log(e));
+
   }
 
 
@@ -97,7 +114,6 @@ export class HomePage implements OnInit, OnDestroy {
     // stop disconnect watch
     this.disconnectSubscription.unsubscribe();
     this.connectSubscription.unsubscribe();
-    this.sqlConn.close();
 
   }
 
